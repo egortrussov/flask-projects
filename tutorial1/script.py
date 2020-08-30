@@ -28,8 +28,17 @@ def home():
 def login():
     if (request.method == 'POST'):
         session.permanent = False
-        usr = request.form['name']
-        session['user'] = usr
+        user = request.form['name']
+        session['user'] = user
+
+        found_user = users.query.filter_by(name=user).first()
+        if found_user:
+            session['email'] = found_user.email
+        else: 
+            usr = users(user, None)
+            db.session.add(usr)
+            db.session.commit()
+
         flash('Login successful')
         return redirect(url_for('user'))
     else:
@@ -43,6 +52,9 @@ def user():
 
         if (request.method == 'POST'):
             email = request.form['email']
+            found_user = users.query.filter_by(name=user).first()
+            found_user.email = email 
+            db.session.commit()
             session['email'] = email
         elif 'email' in session:
             email = session['email']
@@ -50,6 +62,10 @@ def user():
         return render_template('profile.html', email=email)
     else:
         return redirect(url_for('login'))
+
+@app.route('/allUsers')
+def all_users():
+    return render_template('all_users.html', values=users.query.all())
 
 @app.route('/logout')
 def logout():
