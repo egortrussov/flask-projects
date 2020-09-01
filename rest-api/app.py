@@ -33,14 +33,7 @@ ma = Marshmallow(app)
 #         self.price = price
 #         self.qty = qty 
 
-#product schema 
-class ProductSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'name', 'description', 'price', 'qty')
-
-#init schema
-product_schema = ProductSchema()
-products_schema = ProductSchema(many=True)
+#product schema
 
 @app.route('/', methods=['GET'])
 def get():
