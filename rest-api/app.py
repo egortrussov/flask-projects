@@ -2,9 +2,13 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow 
 
+# from classes.Product import Product
+# from routes.products.products import products
+
 import os 
 
 app = Flask(__name__)
+app.config.from_object('config')
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -16,18 +20,18 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app) 
 
 #Product class 
-class Product(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30), unique=True)
-    description = db.Column(db.String(300))
-    price = db.Column(db.Float)
-    qty = db.Column(db.Integer)
+# class Product(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(30), unique=True)
+#     description = db.Column(db.String(300))
+#     price = db.Column(db.Float)
+#     qty = db.Column(db.Integer)
 
-    def __init__(self, name, description, price, qty):
-        self.name=  name
-        self.description = description
-        self.price = price
-        self.qty = qty 
+#     def __init__(self, name, description, price, qty):
+#         self.name=  name
+#         self.description = description
+#         self.price = price
+#         self.qty = qty 
 
 #product schema 
 class ProductSchema(ma.Schema):
@@ -43,6 +47,3 @@ def get():
     return jsonify({
         'msg': 'Hello World'
     })
-
-if (__name__ == '__main__'):
-    app.run(debug=True)
