@@ -31,3 +31,16 @@ def get_all_products():
     all_products = Product.query.all()
     resp = products_schema.dump(all_products)
     return jsonify(resp)
+
+@products.route('/delete', methods=['POST'])
+def delete_products():
+    deleted_products = []
+    products_ids = request.json['ids']
+    for id in products_ids:
+        curr_product = Product.query.filter_by(id=id)
+        deleted_products.append(curr_product.one().__dict__)
+        curr_product.delete()
+        # print(curr_product.__dict__)
+        db.session.commit()
+    resp = products_schema.dump(deleted_products)
+    return jsonify(resp)
