@@ -38,7 +38,7 @@ def delete_products():
     products_ids = request.json['ids']
     for id in products_ids:
         curr_product = Product.query.filter_by(id=id)
-        deleted_products.append(curr_product.one().__dict__)
+        deleted_products.append(curr_product.one())
         curr_product.delete()
         # print(curr_product.__dict__)
         db.session.commit()

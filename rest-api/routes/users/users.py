@@ -1,4 +1,7 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
+from flask_jwt import JWT
+
+import bcrypt
 
 from app import db
 from classes.User import User 
@@ -14,10 +17,41 @@ def get_user(user_id):
 def register():
     username = request.json['username']
     password = request.json['password']
-    print(username, password)
-    new_user = User(username, password) 
+
+    found_user = User.query.filter(User.username == username).scalar()
+    print(found_user)
+    if (found_user):
+        return jsonify({
+            'success': False,
+            'msg': 'User already exists'
+        })
+
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(13))
+
+    new_user = User(username, hashed.decode('utf-8')) 
 
     db.session.add(new_user) 
     db.session.commit() 
 
     return user_schema.jsonify(new_user)    
+
+@users.route('/login', methods=['POST'])
+def login():
+    username = request.json['username']
+    password = request.json['password']
+
+    found_user = User.query.filter(User.username == username).scalar()
+
+    if (not found_user):
+        return jsonify({
+            'success': False,
+            'msg': 'User does not exist'
+        })
+    
+    hashed = str(found_user.password)
+
+    if (bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))):
+        resp = user_schema.dump(found_user)
+        return jsonify({
+            'user': resp
+        })
