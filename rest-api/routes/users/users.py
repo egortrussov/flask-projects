@@ -3,7 +3,7 @@ from flask_jwt import JWT
 
 import bcrypt
 
-from app import db
+from app import db, app
 from classes.User import User 
 from schemas.User import user_schema, users_schema
 
@@ -50,8 +50,14 @@ def login():
     
     hashed = str(found_user.password)
 
-    if (bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))):
+    if (not bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))):
+        return jsonify({
+            success: False,
+            msg: 'Wrong password'
+        })
+    else:
         resp = user_schema.dump(found_user)
+        jwt = JWT(app, lambda: resp, lambda: resp.id)
         return jsonify({
             'user': resp
         })

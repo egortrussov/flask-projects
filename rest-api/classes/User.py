@@ -1,5 +1,8 @@
 from app import db 
 
+
+import datetime
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True)
