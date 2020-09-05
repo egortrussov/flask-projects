@@ -1,5 +1,5 @@
-from app import db 
-
+from app import db, app
+import jwt
 
 import datetime
 
@@ -11,3 +11,5 @@ class User(db.Model):
     def __init__(self, username, password):
         self.username = username 
         self.password = password 
+    
+    

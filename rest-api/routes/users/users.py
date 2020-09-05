@@ -1,11 +1,13 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt import JWT
+import jwt  
 
 import bcrypt
+import datetime
 
 from app import db, app
 from classes.User import User 
 from schemas.User import user_schema, users_schema
+from middlewate.decode_token import decode_token
 
 users = Blueprint('users', __name__)
 
@@ -57,7 +59,18 @@ def login():
         })
     else:
         resp = user_schema.dump(found_user)
-        jwt = JWT(app, lambda: resp, lambda: resp.id)
+        token = jwt.encode({
+            'user_id': found_user.id,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=30)
+        }, app.config['SECRET_KEY']).decode('utf-8')
         return jsonify({
-            'user': resp
+            'user': resp,
+            'token': str(token)
         })
+
+@users.route('/validate', methods=['POST'])
+def validate_page():
+    token = request.headers.get('token').encode()
+    decoded = decode_token(token)
+    print(token)
+    return jsonify(decoded)
